@@ -16,18 +16,24 @@ function MovieForm() {
   })
 }
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    fetch("/movies", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    }).then((response) => console.log(response));
-  
-      
+async function handleSubmit(e) {
+  e.preventDefault();
+  // fetch returns a Promise, we must await it
+  const response = await fetch("/movies", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
+  // response.json() returns a Promise, we must await it
+  const data = await response.json();
+  if (response.ok) {
+    console.log("Movie created:", data);
+  } else {
+    setErrors(data.errors);
   }
+}
 
   function handleChange(e) {
     const value =
@@ -131,7 +137,7 @@ function MovieForm() {
       </form>
     </Wrapper>
   );
-}
+
 
 const Wrapper = styled.section`
   max-width: 500px;
@@ -156,12 +162,5 @@ const SubmitButton = styled.button`
   cursor: pointer;
 `;
 
-.then((response) => {
-  if (response.ok) {
-    response.json().then((newMovie) => console.log(newMovie));
-  } else {
-    response.json().then((errorData) => setErrors(errorData.errors));
-  }
-})
 
 export default MovieForm;
